@@ -9,7 +9,7 @@
 #ifndef RANDOMGRAPHGENERATOR3_CONTACTTRACING_H
 #define RANDOMGRAPHGENERATOR3_CONTACTTRACING_H
 
-#define NUM_VERTICES 20
+#define NUM_VERTICES 100
 #define MAX_NUM_EDGES 5 // to represent maximum direct contacts with one person
 // Structure definitions and function prototypes  copied from Program P7.3 from Kalicharan
 #define NUM_OF_REGIONS 4

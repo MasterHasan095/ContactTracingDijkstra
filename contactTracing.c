@@ -191,10 +191,14 @@ void generateRandomDistinctIntegersWithAnExclusion(int arr[], int cnt, int range
  * @param region
  */
 void printGraph(Graph G, int region) {
+
+    int contactCounter = 0;
     printf("%-15s%-15s%-25s\n", "Person's", "# of direct", "IDs of people");
     printf("%-15s%-15s%-25s\n", "ID", "contacts", "contacted directly");
-    int contactCounter = 0;
     for (int i = 0; i < G->numV; ++i) {
+        if (i%25 == 0 && i != 0 ){
+            printf("%-15s%-15s%-25s\n", "ID", "# of contacts", "IDs of contacts");
+        }
         printf("%-15d", G->vertex[i].id);
         GEdgePtr edge = G->vertex[i].firstEdge;
         while (edge != NULL) {
