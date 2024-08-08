@@ -26,7 +26,7 @@ void followPath(Graph G, int c) {
     if (c != 0) {
         followPath(G, G -> vertex[c].parent);
         if (G -> vertex[c].parent != 0) printf(" -> "); //do not print -> for source
-        printf("rinting 12 : %d ", G -> vertex[c].id);
+        printf("%d ", G -> vertex[c].id);
     }
 } //end followPath
 void siftUp(Graph G, int heap[], int n, int heapLoc[]) {
@@ -84,13 +84,15 @@ void addEdge(int srcID, int destID, int weight, Graph G) {
     int h, k;
     //find srcID in the list of nodes; its location is h
     for (h = 1; h <= G->numV; h++) {
-        if (srcID == G->vertex[h-1].id) {
+//        printf("In add edge srcID: %d, h : %d\n", srcID, h);
+        if (srcID == G->vertex[h].id) {
+//            printf("Breaks at h : %d\n", h);
             break;
         }
     }
 
     //find destID in the list of nodes; its location is k
-    for (k = 1; k <= G->numV; k++) if (destID == G->vertex[k-1].id) break;
+    for (k = 1; k <= G->numV; k++) if (destID == G->vertex[k].id) break;
 
 
     if (h > G->numV || k > G->numV) {
@@ -104,14 +106,14 @@ void addEdge(int srcID, int destID, int weight, Graph G) {
     // add it to the list of edges, possible empty, from X;
     // it is added so that the list is in order by vertex id
     GEdgePtr prev, curr;
-    prev = curr = G->vertex[h-1].firstEdge;
+    prev = curr = G->vertex[h].firstEdge;
     while (curr != NULL && destID > G->vertex[curr->child].id)  {
         prev = curr;
         curr = curr->nextEdge;
     }
     if (prev == curr) {
-        ep->nextEdge = G->vertex[h-1].firstEdge;
-        G->vertex[h-1].firstEdge = ep;
+        ep->nextEdge = G->vertex[h].firstEdge;
+        G->vertex[h].firstEdge = ep;
     } else {
         ep->nextEdge = curr;
         prev->nextEdge = ep;
@@ -141,16 +143,16 @@ char* regionLookup(int region) {
  * @param G is the graph
  */
 void buildGraphRandom(Graph G) {
-    for (int i = 0; i < G->numV; ++i) {
-        G->vertex[i] = newGVertex(i + 1);
+    for (int i = 1; i <= G->numV; ++i) {
+        G->vertex[i] = newGVertex(i);
     }
 
-    for (int i = 0; i < G->numV; ++i) {
+    for (int i = 1; i <= G->numV; ++i) {
         int numEdges = rand() % (MAX_NUM_EDGES + 1); // Random number of edges from 0 to MAX_NUM_EDGES
         int edges[numEdges];
-        generateRandomDistinctIntegersWithAnExclusion(edges, numEdges, G->numV-1, 1, 1, i + 1);
+        generateRandomDistinctIntegersWithAnExclusion(edges, numEdges, G->numV, 1, 1, i);
         for (int j = 0; j < numEdges; ++j) {
-            addEdge(i+1, edges[j], 1, G);
+            addEdge(i, edges[j], 1, G);
         }
     }
 }
@@ -195,8 +197,8 @@ void printGraph(Graph G, int region) {
     int contactCounter = 0;
     printf("%-15s%-15s%-25s\n", "Person's", "# of direct", "IDs of people");
     printf("%-15s%-15s%-25s\n", "ID", "contacts", "contacted directly");
-    for (int i = 0; i < G->numV; ++i) {
-        if (i%25 == 0 && i != 0 ){
+    for (int i = 1; i <= G->numV; ++i) {
+        if (i%25 == 0){
             printf("%-15s%-15s%-25s\n", "ID", "# of contacts", "IDs of contacts");
         }
         printf("%-15d", G->vertex[i].id);
@@ -228,13 +230,13 @@ void writeGraphToFile(FILE* in, Graph G) {
         printf("File could not be opened\n");
     } else {
         fprintf( in, "%d\n", G->numV); // Total num of vertices
-        for (int i = 0; i < G->numV; ++i) {
+        for (int i = 1; i <= G->numV; ++i) {
             fprintf( in, "%-3d", G->vertex[i].id); // All vertices
         }
         fprintf(in,"\n");
 
         int contactCounter = 0;
-        for (int i = 0; i < G->numV; ++i) {
+        for (int i = 1; i <= G->numV; ++i) {
             fprintf( in, "%d :", G->vertex[i].id);
 
             GEdgePtr edge = G->vertex[i].firstEdge;
@@ -279,46 +281,40 @@ void writeGraphToFile(FILE* in, Graph G) {
  */
 int DijkstraContactTracing(Graph G, int s, int d) {
     int heap[NUM_VERTICES + 1], heapLoc[NUM_VERTICES + 1];
-    initSingleSource(G, s);
-    for (int i = 1; i <= G->numV; i++) {
-        heap[i] = i;
-        heapLoc[i] = i;
-    }
-    heap[1] = s;
-    heap[s] = 1;
-    heapLoc[s] = 1;
-    heapLoc[1] = s;
-    int heapSize = G->numV;
+    //heapLoc[i] gives the position in heap of vertex i
+    //if heapLoc[i] = k, then heap[k] contains i
 
+    initSingleSource(G, s);
+    for (int i = 1; i <= G -> numV; i++) heap[i] = heapLoc[i] = i;
+    heap[1] = s; heap[s] = 1; heapLoc[s] = 1; heapLoc[1] = s;
+    int heapSize = G -> numV;
     while (heapSize > 0) {
         int u = heap[1];
-        if (G->vertex[u].cost == INT_MAX) break; // no paths to other vertices
-        heap[1] = heap[heapSize];
-        heapLoc[heap[heapSize]] = 1;
-        heapSize--;
-        siftDown(G, heap[1], heap, 1, heapSize, heapLoc);
+        if (G -> vertex[u].cost == Infinity) break; //no paths to other vertices
+        //reorganize heap after removing top item
+        siftDown(G, heap[heapSize], heap, 1, heapSize-1, heapLoc);
+        GEdgePtr p = G -> vertex[u].firstEdge;
+        while (p != NULL) {
+            if (G -> vertex[u].cost + p -> weight < G -> vertex[p -> child].cost) {
+                G -> vertex[p -> child].cost = G -> vertex[u].cost + p -> weight;
+                G -> vertex[p -> child].parent = u;
+                siftUp(G, heap, heapLoc[p -> child], heapLoc);
+            }
+            p = p -> nextEdge;
+        }
+        --heapSize;
+    } //end while
 
-        GEdgePtr edge = G->vertex[u].firstEdge;
-        while (edge != NULL) {
-            int v = edge->child;
-            if (G->vertex[u].cost + edge->weight < G->vertex[v].cost) {
-                G->vertex[v].cost = G->vertex[u].cost + edge->weight;
-                G->vertex[v].parent = u;
-                siftUp(G, heap, heapLoc[v], heapLoc);
+//    return 0;
+//
+    for (int i = 1; i <= G -> numV; i++) {
+        if (G->vertex[i].id == d){
+            if (G -> vertex[i].cost == (-1-INT_MAX)){
+                return INT_MAX-1;
             }
-            if (v == d) { // destination reached
-                int count = 0;
-                int temp = v;
-                while (G->vertex[temp].parent != s) {
-                    count++;
-                    temp = G->vertex[temp].parent;
-                }
-                return count;
-            }
-            edge = edge->nextEdge;
+            return G -> vertex[i].cost - 1;
         }
     }
-    return -1; // destination not reachable
 }
 //ends DijkstraContactTracing
 

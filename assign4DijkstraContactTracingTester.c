@@ -1,6 +1,6 @@
 /*
- * Assignment submitted by (name of student):
- * on (date):
+ * Assignment submitted by (name of student): Hasan Master
+ * on (date): 2024-08-08
  * assign4DijkstraContactTracingTester.c written by M. Mohiuddin on March 20, 2021 and revised on Nov 14, 2021. It randomly
  * generates the contact tracing database for a population and then uses Dijkstra algorithm to find the contact history
  * of the population and can find the contact trace of any pair of persons.
