@@ -136,16 +136,11 @@ void buildGraphRandom(Graph G) {
     }
     int narrower = G->numV <= MAX_NUM_EDGES ? G->numV-1 : (MAX_NUM_EDGES+1);
     for (int i = 1; i <= G->numV; ++i) {
-        printf("G->numV, MAX_NUM_EDGES, narrower : %d, %d, %d \n", G->numV, MAX_NUM_EDGES, narrower);
         int numEdges = rand() % narrower;
-        printf("Numbedges : %d \n", numEdges);
         int edges[numEdges];
-        puts("Reach chceck");
-        generateRandomDistinctIntegersWithAnExclusion(edges, numEdges, G->numV-1, 1, 1, i);
-        puts("Reach check 2");
+        generateRandomDistinctIntegersWithAnExclusion(edges, numEdges, G->numV, 1, 1, i);
 
         for (int j = 0; j < numEdges; ++j) {
-            puts("looping here");
             addEdge(i, edges[j], 1, G);
         }
     }
@@ -189,6 +184,7 @@ void generateRandomDistinctIntegersWithAnExclusion(int arr[], int cnt, int range
 void printGraph(Graph G, int region) {
 
     int contactCounter = 0;
+    printf("----------Contact tracing database of %d residents of %s----------\n",G->numV, regionLookup(region-1));
     printf("%-15s%-15s%-25s\n", "Person's", "# of direct", "IDs of people");
     printf("%-15s%-15s%-25s\n", "ID", "contacts", "contacted directly");
     for (int i = 1; i <= G->numV; ++i) {
