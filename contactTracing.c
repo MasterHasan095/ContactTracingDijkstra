@@ -78,30 +78,17 @@ GVertex newGVertex(int id) {
     return temp;
 }
 void addEdge(int srcID, int destID, int weight, Graph G) {
-//    printf("Receiving Data : Src : %d  ,  dest : %d\n", srcID, destID);
 
     //add an edge srcID -> destID with a given weight
     int h, k;
     //find srcID in the list of nodes; its location is h
-    for (h = 1; h <= G->numV; h++) {
-//        printf("In add edge srcID: %d, h : %d\n", srcID, h);
-        if (srcID == G->vertex[h].id) {
-//            printf("Breaks at h : %d\n", h);
-            break;
-        }
-    }
-
+    for (h = 1; h <= G->numV; h++) if (srcID == G->vertex[h].id) break;
     //find destID in the list of nodes; its location is k
     for (k = 1; k <= G->numV; k++) if (destID == G->vertex[k].id) break;
-
-
     if (h > G->numV || k > G->numV) {
-        printf("No such edge: %d -> %d\n", h, k);
+        printf("No such edge: %d -> %d\n", srcID, destID);
         exit(1);
     }
-//    printf("H and K are  : H : %d  ,  K : %d\n\n", h, k);
-
-
     GEdgePtr ep = newGEdge(k, weight); //create edge vertex
     // add it to the list of edges, possible empty, from X;
     // it is added so that the list is in order by vertex id
@@ -114,7 +101,8 @@ void addEdge(int srcID, int destID, int weight, Graph G) {
     if (prev == curr) {
         ep->nextEdge = G->vertex[h].firstEdge;
         G->vertex[h].firstEdge = ep;
-    } else {
+    }
+    else {
         ep->nextEdge = curr;
         prev->nextEdge = ep;
     }
@@ -146,12 +134,18 @@ void buildGraphRandom(Graph G) {
     for (int i = 1; i <= G->numV; ++i) {
         G->vertex[i] = newGVertex(i);
     }
-
+    int narrower = G->numV <= MAX_NUM_EDGES ? G->numV-1 : (MAX_NUM_EDGES+1);
     for (int i = 1; i <= G->numV; ++i) {
-        int numEdges = rand() % (MAX_NUM_EDGES + 1); // Random number of edges from 0 to MAX_NUM_EDGES
+        printf("G->numV, MAX_NUM_EDGES, narrower : %d, %d, %d \n", G->numV, MAX_NUM_EDGES, narrower);
+        int numEdges = rand() % narrower;
+        printf("Numbedges : %d \n", numEdges);
         int edges[numEdges];
-        generateRandomDistinctIntegersWithAnExclusion(edges, numEdges, G->numV, 1, 1, i);
+        puts("Reach chceck");
+        generateRandomDistinctIntegersWithAnExclusion(edges, numEdges, G->numV-1, 1, 1, i);
+        puts("Reach check 2");
+
         for (int j = 0; j < numEdges; ++j) {
+            puts("looping here");
             addEdge(i, edges[j], 1, G);
         }
     }

@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "contactTracing.h"
+#include "time.h"
 typedef struct {
     int srcId;
     int destIds[MAX_NUM_EDGES];
